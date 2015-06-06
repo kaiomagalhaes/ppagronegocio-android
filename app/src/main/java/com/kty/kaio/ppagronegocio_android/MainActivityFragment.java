@@ -6,6 +6,9 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,37 +32,31 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
 
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.datasearchfragment, menu);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if (id == R.id.action_refresh) {
+            FetchDataTask task = new FetchDataTask();
+            task.execute();
+
+            return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FetchDataTask task = new FetchDataTask();
-        task.execute();
+
         return inflater.inflate(R.layout.fragment_main, container, false);
-    }
-
-    private String[] getDataFromJson(String forecastJsonStr)
-            throws JSONException {
-        JSONObject forecastJson = new JSONObject(forecastJsonStr);
-        JSONArray weatherArray = forecastJson.getJSONArray("months");
-        JSONObject lastMonth = weatherArray.getJSONObject(weatherArray.length() - 1);
-        JSONArray products = lastMonth.getJSONArray("products");
-        String month = lastMonth.getString("month");
-
-        System.out.println(products);
-        String[] resultStrs = new String[products.length()+2];
-        resultStrs[0] = month;
-        for (int i = 0; i < products.length(); i++) {
-            JSONObject product = products.getJSONObject(i);
-            String name = product.getString("name");
-            String priceIndex = product.getString("priceIndex");
-            resultStrs[i + 1] = name + " => " + priceIndex;
-        }
-
-        for (String s : resultStrs) {
-            Log.v("WeaterApp", "Forecast entry: " + s);
-        }
-
-        return resultStrs;
     }
 
     public class FetchDataTask extends AsyncTask<String, Void, String[]> {
@@ -117,6 +114,31 @@ public class MainActivityFragment extends Fragment {
             }
 
             return null;
+        }
+
+        private String[] getDataFromJson(String json)
+                throws JSONException {
+            JSONObject forecastJson = new JSONObject(json);
+            JSONArray weatherArray = forecastJson.getJSONArray("months");
+            JSONObject lastMonth = weatherArray.getJSONObject(weatherArray.length() - 1);
+            JSONArray products = lastMonth.getJSONArray("products");
+            String month = lastMonth.getString("month");
+
+            System.out.println(products);
+            String[] resultStrs = new String[products.length() + 2];
+            resultStrs[0] = month;
+            for (int i = 0; i < products.length(); i++) {
+                JSONObject product = products.getJSONObject(i);
+                String name = product.getString("name");
+                String priceIndex = product.getString("priceIndex");
+                resultStrs[i + 1] = name + " => " + priceIndex;
+            }
+
+            for (String s : resultStrs) {
+                Log.v("WeaterApp", "Forecast entry: " + s);
+            }
+
+            return resultStrs;
         }
     }
 }
