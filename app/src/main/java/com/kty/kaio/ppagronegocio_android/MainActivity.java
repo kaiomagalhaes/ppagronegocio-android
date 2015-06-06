@@ -7,9 +7,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private ProgressBar spinner;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,29 +28,25 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    public void setPreferedMonth(int preferedMonth){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.edit().putInt("month", preferedMonth).apply();
+    }
+
     public Integer getPreferedMonth() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         return  sp.getInt("month", 0);
     }
 
     private void previousPreferedMonth() {
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(this);
-
-        Integer actual = sp.getInt("month", 0);
-
+        Integer actual = getPreferedMonth();
         if (actual != 0) {
-            sp.edit().putInt("month", actual - 1).apply();
+            setPreferedMonth(actual - 1);
         }
     }
 
     private void nextPreferedMonth() {
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(this);
-
-        Integer actual = sp.getInt("month", 0);
-
-        sp.edit().putInt("month", actual + 1).apply();
+        setPreferedMonth(getPreferedMonth() + 1);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -3,6 +3,8 @@ package com.kty.kaio.ppagronegocio_android;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +23,9 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
 
     public FetchDataTask(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
+        ProgressBar progressBar = ((ProgressBar) this.mainActivity.findViewById(R.id.progressBar1));
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.bringToFront();
     }
 
     protected String[] doInBackground(String... params) {
@@ -81,6 +86,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
         if (result != null) {
             this.mainActivity.setReclyclerViewData(result);
         }
+        ((ProgressBar) this.mainActivity.findViewById(R.id.progressBar1)).setVisibility(View.GONE);
     }
 
     private String[] getDataFromJson(String json)
@@ -90,24 +96,24 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
         JSONArray weatherArray = forecastJson.getJSONArray("months");
 
         int index = this.mainActivity.getPreferedMonth();
-
-        JSONObject lastMonth;
-        try {
-            lastMonth = weatherArray.getJSONObject(index);
-        } catch (Exception e) {
-            lastMonth = weatherArray.getJSONObject(index - 1);
+        int max = weatherArray.length() - 1;
+        if (index > max) {
+            index = max;
+            this.mainActivity.setPreferedMonth(index);
         }
+        JSONObject lastMonth = weatherArray.getJSONObject(index);
+
 
         JSONArray products = lastMonth.getJSONArray("products");
         String month = lastMonth.getString("month");
 
         String[] resultStrs = new String[products.length() + 2];
-        resultStrs[0] = month;
+        resultStrs[0] = "Month: " + month;
         for (int i = 0; i < products.length(); i++) {
             JSONObject product = products.getJSONObject(i);
             String name = product.getString("name");
             String priceIndex = product.getString("priceIndex");
-            resultStrs[i + 1] = name + " => " + priceIndex;
+            resultStrs[i + 1] = name + " - " + priceIndex;
         }
 
         for (String s : resultStrs) {

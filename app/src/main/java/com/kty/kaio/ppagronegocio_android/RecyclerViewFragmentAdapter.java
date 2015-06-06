@@ -1,5 +1,8 @@
 package com.kty.kaio.ppagronegocio_android;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +35,10 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     public void onBindViewHolder(ViewHolder holder, int position) {
+        if (position == 0) {
+            holder.mTextView.setBackgroundColor(0xFFFFFF00);
+        }
         holder.mTextView.setText(mDataset[position]);
-        holder.mTextView.setTextSize(40);
     }
 
     public int getItemCount() {
