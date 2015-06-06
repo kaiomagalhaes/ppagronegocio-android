@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 public class MainActivity extends ActionBarActivity {
 
     private ProgressBar spinner;
-
+    private String SHARED_PREFERENCE_MONTH = "month";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,12 +30,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void setPreferedMonth(int preferedMonth){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        sp.edit().putInt("month", preferedMonth).apply();
+        sp.edit().putInt(SHARED_PREFERENCE_MONTH, preferedMonth).apply();
     }
 
     public Integer getPreferedMonth() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        return  sp.getInt("month", 0);
+        return  sp.getInt(SHARED_PREFERENCE_MONTH, 0);
     }
 
     private void previousPreferedMonth() {

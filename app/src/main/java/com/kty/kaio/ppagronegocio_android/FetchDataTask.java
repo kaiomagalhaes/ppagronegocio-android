@@ -15,15 +15,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class FetchDataTask extends AsyncTask<String, Void, String[]> {
 
     private MainActivity mainActivity;
+    private String BASE_URL = "http://ppagronegocio.herokuapp.com/json/graph-index-price.json";
 
     public FetchDataTask(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        ProgressBar progressBar = ((ProgressBar) this.mainActivity.findViewById(R.id.progressBar1));
+        handleProgressBar();
+    }
+
+    private void handleProgressBar() {
+        ProgressBar progressBar = getProgressBar();
         progressBar.setVisibility(View.VISIBLE);
         progressBar.bringToFront();
     }
@@ -33,30 +39,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
         BufferedReader reader = null;
         String json = null;
         try {
-            String BASE_URL = "http://ppagronegocio.herokuapp.com/json/graph-index-price.json";
-            Uri uri = Uri.parse(BASE_URL);
-            URL url = new URL(uri.toString());
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                return null;
-            }
-            json = buffer.toString();
-            Log.v("PpagronegocioWebservice", "JSON:" + json);
+            json = getData(urlConnection, reader);
         } catch (IOException e) {
             Log.e("PlaceholderFragment", "Error ", e);
             return null;
@@ -82,26 +65,50 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
+    private String getData(HttpURLConnection urlConnection, BufferedReader reader) throws MalformedURLException, IOException {
+        URL url = new URL(BASE_URL);
+        urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuffer buffer = new StringBuffer();
+        if (inputStream == null) {
+            return null;
+        }
+        reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line + "\n");
+        }
+
+        if (buffer.length() == 0) {
+            return null;
+        }
+        return buffer.toString();
+    }
+
     protected void onPostExecute(String[] result) {
         if (result != null) {
             this.mainActivity.setReclyclerViewData(result);
         }
-        ((ProgressBar) this.mainActivity.findViewById(R.id.progressBar1)).setVisibility(View.GONE);
+        getProgressBar().setVisibility(View.GONE);
     }
 
     private String[] getDataFromJson(String json)
             throws JSONException {
 
-        JSONObject forecastJson = new JSONObject(json);
-        JSONArray weatherArray = forecastJson.getJSONArray("months");
+        JSONObject dataJson = new JSONObject(json);
+        JSONArray months = dataJson.getJSONArray("months");
 
         int index = this.mainActivity.getPreferedMonth();
-        int max = weatherArray.length() - 1;
+        int max = months.length() - 1;
         if (index > max) {
             index = max;
             this.mainActivity.setPreferedMonth(index);
         }
-        JSONObject lastMonth = weatherArray.getJSONObject(index);
+        JSONObject lastMonth = months.getJSONObject(index);
 
 
         JSONArray products = lastMonth.getJSONArray("products");
@@ -116,10 +123,11 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
             resultStrs[i + 1] = name + " - " + priceIndex;
         }
 
-        for (String s : resultStrs) {
-            Log.v("WeaterApp", "Forecast entry: " + s);
-        }
-
         return resultStrs;
     }
+
+    private ProgressBar getProgressBar() {
+        return ((ProgressBar) this.mainActivity.findViewById(R.id.progressBar1));
+    }
+
 }
