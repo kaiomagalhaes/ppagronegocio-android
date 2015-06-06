@@ -2,7 +2,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_refresh"
-        android:title="refresh"
+        android:title="Refresh"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/previous_month"
+        android:title="Previous Month"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/next_month"
+        android:title="Next Month"
         app:showAsAction="never"
         />
 </menu>

@@ -19,7 +19,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
 
     private MainActivity mainActivity;
 
-    public FetchDataTask(MainActivity mainActivity){
+    public FetchDataTask(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 
@@ -85,9 +85,19 @@ public class FetchDataTask extends AsyncTask<String, Void, String[]> {
 
     private String[] getDataFromJson(String json)
             throws JSONException {
+
         JSONObject forecastJson = new JSONObject(json);
         JSONArray weatherArray = forecastJson.getJSONArray("months");
-        JSONObject lastMonth = weatherArray.getJSONObject(weatherArray.length() - 1);
+
+        int index = this.mainActivity.getPreferedMonth();
+
+        JSONObject lastMonth;
+        try {
+            lastMonth = weatherArray.getJSONObject(index);
+        } catch (Exception e) {
+            lastMonth = weatherArray.getJSONObject(index - 1);
+        }
+
         JSONArray products = lastMonth.getJSONArray("products");
         String month = lastMonth.getString("month");
 

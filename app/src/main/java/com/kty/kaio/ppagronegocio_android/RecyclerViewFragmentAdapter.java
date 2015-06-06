@@ -20,7 +20,6 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     public RecyclerViewFragmentAdapter(String[] myDataset) {
-
         mDataset = myDataset;
     }
 
@@ -34,6 +33,7 @@ public class RecyclerViewFragmentAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.mTextView.setText(mDataset[position]);
+        holder.mTextView.setTextSize(40);
     }
 
     public int getItemCount() {
